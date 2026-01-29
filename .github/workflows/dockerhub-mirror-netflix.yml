@@ -51,7 +51,7 @@ jobs:
           docker tag "${SRC_IMAGE}" "${DEST_IMAGE}:${{ steps.vars.outputs.TAG_DATE }}"
 
       - name: Trivy scan (table) - fail on HIGH/CRITICAL
-        uses: aquasecurity/trivy-action@v0.33.1
+        uses: aquasecurity/trivy-action@b6643a29fecd7f34b3597bc6acb0a98b03d33ff8
         with:
           scan-type: image
           image-ref: ${{ env.DEST_IMAGE }}:latest
@@ -62,7 +62,7 @@ jobs:
           exit-code: "1"
 
       - name: Trivy scan (SARIF report)
-        uses: aquasecurity/trivy-action@v0.33.1
+        uses: aquasecurity/trivy-action@b6643a29fecd7f34b3597bc6acb0a98b03d33ff8
         with:
           scan-type: image
           image-ref: ${{ env.DEST_IMAGE }}:latest
