@@ -48,7 +48,6 @@ jobs:
           docker tag "${SRC_IMAGE}" "${DEST_IMAGE}:${{ steps.vars.outputs.TAG_SHA }}"
           docker tag "${SRC_IMAGE}" "${DEST_IMAGE}:${{ steps.vars.outputs.TAG_DATE }}"
 
-      # Trivy pinned by SHA (عشان مشكلة resolve النسخ)
       - name: Trivy scan (table) - fail on HIGH/CRITICAL
         uses: aquasecurity/trivy-action@b6643a29fecd7f34b3597bc6acb0a98b03d33ff8
         with:
