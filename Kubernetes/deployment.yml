@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: netflix
-          image: sohila11/netflix-clone:main-c89b247
+          image: sohila11/netflix-clone:main-gitops-test
           imagePullPolicy: Always
           ports:
             - containerPort: 80
