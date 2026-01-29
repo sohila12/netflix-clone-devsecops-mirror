@@ -85,16 +85,28 @@ jobs:
           git commit -m "chore(gitops): deploy image ${TARGET_REPO}:${{ steps.vars.outputs.tag }}"
           git push
 
-      - name: Notify Slack on failure (if configured)
-        if: failure() && secrets.SLACK_WEBHOOK_URL != ''
+      - name: Notify Slack on failure (optional)
+        if: failure()
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         run: |
+          if [ -z "${SLACK_WEBHOOK_URL}" ]; then
+            echo "SLACK_WEBHOOK_URL not set - skipping"
+            exit 0
+          fi
           curl -X POST -H 'Content-type: application/json' \
             --data "{\"text\":\"❌ Netflix pipeline failed on ${GITHUB_REPOSITORY} @ ${GITHUB_SHA::7}.\"}" \
-            "${{ secrets.SLACK_WEBHOOK_URL }}"
+            "${SLACK_WEBHOOK_URL}"
 
-      - name: Notify Teams on failure (if configured)
-        if: failure() && secrets.TEAMS_WEBHOOK_URL != ''
+      - name: Notify Teams on failure (optional)
+        if: failure()
+        env:
+          TEAMS_WEBHOOK_URL: ${{ secrets.TEAMS_WEBHOOK_URL }}
         run: |
+          if [ -z "${TEAMS_WEBHOOK_URL}" ]; then
+            echo "TEAMS_WEBHOOK_URL not set - skipping"
+            exit 0
+          fi
           curl -H "Content-Type: application/json" \
             -d "{\"text\":\"❌ Netflix pipeline failed on ${GITHUB_REPOSITORY} @ ${GITHUB_SHA::7}.\"}" \
-            "${{ secrets.TEAMS_WEBHOOK_URL }}"
+            "${TEAMS_WEBHOOK_URL}"
