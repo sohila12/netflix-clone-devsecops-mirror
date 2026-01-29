@@ -3,6 +3,7 @@ kind: Ingress
 metadata:
   name: netflix-ingress
   namespace: netflix
+  namespace: netflix
   annotations:
     nginx.ingress.kubernetes.io/ssl-redirect: "false"
 spec:
