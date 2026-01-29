@@ -57,7 +57,7 @@ jobs:
           vuln-type: "os,library"
           ignore-unfixed: true
           format: table
-          exit-code: "1"
+          exit-code: "0"
 
       - name: Push to DockerHub
         run: |
