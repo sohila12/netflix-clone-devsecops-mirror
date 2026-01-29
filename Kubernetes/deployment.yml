@@ -17,9 +17,9 @@ spec:
       containers:
         - name: netflix
 <<<<<<< Updated upstream
-          image: sohila11/netflix-clone:main-e555810
+          image: sohila11/netflix-clone:main-86bcbb2
 =======
-          image: sohila11/netflix-clone:main-e555810
+          image: sohila11/netflix-clone:main-86bcbb2
 >>>>>>> Stashed changes
           imagePullPolicy: Always
           ports:
