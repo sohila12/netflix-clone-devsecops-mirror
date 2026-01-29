@@ -1,4 +1,0 @@
-name: Mirror Mostafa Netflix Image (Pull → Scan → Push to DockerHub)
-
-on:
-  workflow_dispatch:

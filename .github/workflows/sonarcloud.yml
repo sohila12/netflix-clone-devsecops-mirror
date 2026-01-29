@@ -1,9 +1,0 @@
-name: SonarCloud (Application-Code)
-
-on:
-  pull_request:
-    branches: ["main"]
-    paths:
-      - "Application-Code/**"
-      - "sonar-project.properties"
-      - ".github/workflows/sonarcloud.yml"

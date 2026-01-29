@@ -1,4 +1,0 @@
-name: Docker (Build → Scan → Push)
-
-on:
-  workflow_dispatch:

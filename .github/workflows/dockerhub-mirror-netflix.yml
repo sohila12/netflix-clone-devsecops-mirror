@@ -1,4 +1,0 @@
-name: Mirror Netflix Clone Image to DockerHub (Pull → Scan → Push)
-
-on:
-  workflow_dispatch:
