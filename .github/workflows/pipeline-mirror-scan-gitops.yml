@@ -2,8 +2,6 @@ name: Netflix Mirror DevSecOps Pipeline (Trivy + GitOps + Notifications)
 
 on:
   workflow_dispatch:
-  push:
-    branches: ["main"]
 
 permissions:
   contents: write
