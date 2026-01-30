@@ -1,3 +1,7 @@
 
 # node
 node_modules/
+
+# coverage outputs
+Source-Code/Application-Code/coverage/
+Source-Code/Application-Code/vite.config.ts.bak
