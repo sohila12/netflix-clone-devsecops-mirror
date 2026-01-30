@@ -111,6 +111,12 @@ jobs:
             echo "Add variable SONAR_ORG with your SonarCloud organization key."
             exit 1
           fi
+          if [ -z "${{ vars.SONAR_PROJECT_KEY }}" ]; then
+            echo "ERROR: vars.SONAR_PROJECT_KEY is missing."
+            echo "Go to: Settings -> Secrets and variables -> Actions -> Variables"
+            echo "Add variable SONAR_PROJECT_KEY with your SonarCloud project key."
+            exit 1
+          fi
           if [ -z "${{ secrets.SONAR_TOKEN }}" ]; then
             echo "ERROR: secrets.SONAR_TOKEN is missing."
             exit 1
@@ -127,17 +133,20 @@ jobs:
         working-directory: ${{ env.APP_DIR }}
         run: npm ci
 
-      - name: SonarCloud scan
-        uses: SonarSource/sonarqube-scan-action@v5.0.0
+      # Optional: generate coverage if you want Sonar to read it
+      # - name: Run tests with coverage (optional)
+      #   working-directory: ${{ env.APP_DIR }}
+      #   run: npm test -- --coverage
+
+      - name: SonarCloud Scan (Application-Code only)
+        uses: SonarSource/sonarcloud-github-action@v3
         env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
-          args: >
-            -Dsonar.organization=${{ vars.SONAR_ORG }}
-            -Dsonar.projectKey=${{ github.repository_owner }}_${{ github.event.repository.name }}
-            -Dsonar.sources=${{ env.APP_DIR }}
-            -Dsonar.exclusions=**/node_modules/**,**/dist/**,**/build/**,**/*.min.js
-            -Dsonar.javascript.node.maxspace=4096
+         args: >
+           -Dsonar.organization=${{ vars.SONAR_ORG }}
+           -Dsonar.projectKey=${{ vars.SONAR_PROJECT_KEY }}
+
 
   owasp_dependency_check:
     runs-on: ubuntu-latest
