@@ -109,13 +109,6 @@ jobs:
         run: |
           curl -I http://localhost:9000 | head -n 5
 
-      - name: Recognize App path
-        shell: bash
-        run: |
-          echo "APP_DIR=${{ env.APP_DIR }}"
-          ls -la "${{ env.APP_DIR }}" | head
-          test -d "${{ env.APP_DIR }}/src" && echo "✅ src exists" || (echo "❌ src missing" && exit 1)
-
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
@@ -125,22 +118,11 @@ jobs:
 
       - name: Install deps
         working-directory: ${{ env.APP_DIR }}
-        shell: bash
         run: npm ci
 
       - name: Run tests with coverage (Vitest)
         working-directory: ${{ env.APP_DIR }}
-        shell: bash
         run: npm run test:coverage
-
-      - name: Normalize lcov paths (Windows -> POSIX)
-        shell: bash
-        working-directory: ${{ env.APP_DIR }}
-        run: |
-          test -f coverage/lcov.info
-          sed -i 's#\\#/#g' coverage/lcov.info
-          echo "Sample SF lines after normalize:"
-          grep -n "^SF:" coverage/lcov.info | head -n 10
 
       - name: Normalize lcov paths for SonarQube (Windows runner)
         shell: bash
@@ -152,10 +134,7 @@ jobs:
           p = Path(r"${{ env.APP_DIR }}/coverage/lcov.info")
           txt = p.read_text(encoding="utf-8")
 
-          
           txt = txt.replace("\\\\", "/")
-
-        
           txt = re.sub(r"SF:.*?/Source-Code/Application-Code/", "SF:Source-Code/Application-Code/", txt)
 
           p.write_text(txt, encoding="utf-8")
@@ -177,21 +156,18 @@ jobs:
           echo "---- sample SF lines ----"
           grep -n "^SF:" "${{ env.APP_DIR }}/coverage/lcov.info" | head -n 10
 
-      - name: SonarQube Local Scan
+      - name: SonarQube scan (local)
         uses: SonarSource/sonarqube-scan-action@v5.0.0
         env:
-          SONAR_HOST_URL: http://localhost:9000
-          SONAR_TOKEN: ${{ secrets.SONARQUBE_TOKEN }}
+          SONARQUBE_TOKEN: ${{ secrets.SONARQUBE_TOKEN }}
         with:
           args: >
             -Dsonar.projectKey=sohila12_netflix-clone-devsecops-mirror_local
             -Dsonar.projectName=sohila12-netflix-clone-devsecops-mirror-local
             -Dsonar.sources=Source-Code/Application-Code/src
             -Dsonar.tests=Source-Code/Application-Code/src
-            -Dsonar.test.inclusions=**/*.test.ts,**/*.test.tsx,**/*.spec.ts,**/*.spec.tsx
-            -Dsonar.coverage.exclusions=**/*.test.*,**/*.spec.*,**/setupTests.*,**/vite-env.d.ts
-            -Dsonar.exclusions=**/node_modules/**,**/dist/**,**/build/**,**/coverage/**,**/*.min.js
             -Dsonar.javascript.lcov.reportPaths=Source-Code/Application-Code/coverage/lcov.info
+            -Dsonar.exclusions=**/node_modules/**,**/dist/**,**/coverage/**
 
   owasp_dependency_check:
     runs-on: ubuntu-latest
@@ -226,22 +202,7 @@ jobs:
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         run: |
-          if [ -z "${SLACK_WEBHOOK_URL}" ]; then
-            echo "SLACK_WEBHOOK_URL not set - skipping"
-            exit 0
-          fi
+          if [ -z "${SLACK_WEBHOOK_URL}" ]; then exit 0; fi
           curl -X POST -H 'Content-type: application/json' \
             --data "{\"text\":\"❌ DevSecOps pipeline failed on ${GITHUB_REPOSITORY} @ ${GITHUB_SHA::7}.\"}" \
             "${SLACK_WEBHOOK_URL}"
-
-      - name: Notify Teams (optional)
-        env:
-          TEAMS_WEBHOOK_URL: ${{ secrets.TEAMS_WEBHOOK_URL }}
-        run: |
-          if [ -z "${TEAMS_WEBHOOK_URL}" ]; then
-            echo "TEAMS_WEBHOOK_URL not set - skipping"
-            exit 0
-          fi
-          curl -H "Content-Type: application/json" \
-            -d "{\"text\":\"❌ DevSecOps pipeline failed on ${GITHUB_REPOSITORY} @ ${GITHUB_SHA::7}.\"}" \
-            "${TEAMS_WEBHOOK_URL}"
