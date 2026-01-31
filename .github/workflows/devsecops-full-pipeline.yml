@@ -148,7 +148,7 @@ jobs:
         with:
           args: >
             -Dsonar.projectKey=${{ github.repository_owner }}_${{ github.event.repository.name }}_local
-            -Dsonar.projectName=${{ github.repository }} (local)
+            -Dsonar.projectName=netflix-clone-local
             -Dsonar.sources=${{ env.APP_DIR }}/src
             -Dsonar.exclusions=**/node_modules/**,**/dist/**,**/build/**,**/coverage/**,**/*.min.js
             -Dsonar.javascript.lcov.reportPaths=${{ env.APP_DIR }}/coverage/lcov.info
@@ -168,6 +168,7 @@ jobs:
           path: "${{ env.APP_DIR }}"
           format: "HTML"
           out: "reports"
+          args: "--noupdate --disableYarnAudit"
 
       - name: Upload OWASP report
         uses: actions/upload-artifact@v4
