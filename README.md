@@ -5,3 +5,4 @@ This repo mirrors an existing Docker image:
 - Destination: sohila11/netflix-clone (DockerHub)
 
 Pipeline: GitHub Actions (Pull → Trivy Scan → Push)
+# trigger workflow
