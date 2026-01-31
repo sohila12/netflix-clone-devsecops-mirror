@@ -133,6 +133,15 @@ jobs:
         shell: bash
         run: npm run test:coverage
 
+      - name: Normalize lcov paths (Windows -> POSIX)
+        shell: bash
+        working-directory: ${{ env.APP_DIR }}
+        run: |
+          test -f coverage/lcov.info
+          sed -i 's#\\#/#g' coverage/lcov.info
+          echo "Sample SF lines after normalize:"
+          grep -n "^SF:" coverage/lcov.info | head -n 10
+
       - name: Normalize lcov paths for SonarQube (Windows runner)
         shell: bash
         run: |

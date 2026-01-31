@@ -1,26 +1,36 @@
 /// <reference types="vitest" />
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+/// <reference types="vite/client" />
+
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
 
 export default defineConfig(({ mode }) => {
-  // Vitest عادة بيحط env اسمها VITEST أثناء التشغيل
-  const isVitest = !!process.env.VITEST || mode === 'test'
+  const isTest = mode === "test";
 
   return {
     plugins: [
-      // أثناء test: اقفلي react-refresh
-      isVitest ? react({ fastRefresh: false }) : react(),
+      react({
+        // disable react refresh during tests (fix file:///@react-refresh on Windows)
+        fastRefresh: !isTest,
+      }),
     ],
 
     test: {
+      environment: "jsdom",
       globals: true,
-      environment: 'jsdom',
-      setupFiles: ['src/setupTests.ts'],
+      setupFiles: "./src/setupTests.ts",
       coverage: {
-        provider: 'v8',
-        reporter: ['text', 'lcov'],
-        reportsDirectory: 'coverage'
-      }
-    }
-  }
-})
+        provider: "v8",
+        reporter: ["text", "lcov"],
+        reportsDirectory: "coverage",
+        include: ["src/**/*.{ts,tsx}"],
+        exclude: [
+          "src/**/*.test.{ts,tsx}",
+          "src/**/*.spec.{ts,tsx}",
+          "src/setupTests.ts",
+          "src/vite-env.d.ts",
+        ],
+      },
+    },
+  };
+});
