@@ -156,12 +156,14 @@ jobs:
           echo "---- sample SF lines ----"
           grep -n "^SF:" "${{ env.APP_DIR }}/coverage/lcov.info" | head -n 10
 
+      # ✅ SonarQube step (as requested)
       - name: SonarQube scan (local)
         uses: SonarSource/sonarqube-scan-action@v5.0.0
         env:
-          SONARQUBE_TOKEN: ${{ secrets.SONARQUBE_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
           args: >
+            -Dsonar.host.url=http://localhost:9000
             -Dsonar.projectKey=sohila12_netflix-clone-devsecops-mirror_local
             -Dsonar.projectName=sohila12-netflix-clone-devsecops-mirror-local
             -Dsonar.sources=Source-Code/Application-Code/src
