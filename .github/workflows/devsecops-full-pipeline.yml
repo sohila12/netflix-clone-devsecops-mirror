@@ -133,12 +133,40 @@ jobs:
         shell: bash
         run: npm run test:coverage
 
+      - name: Normalize lcov paths for SonarQube (Windows runner)
+        shell: bash
+        run: |
+          python - <<'PY'
+          import re
+          from pathlib import Path
+
+          p = Path(r"${{ env.APP_DIR }}/coverage/lcov.info")
+          txt = p.read_text(encoding="utf-8")
+
+          
+          txt = txt.replace("\\\\", "/")
+
+        
+          txt = re.sub(r"SF:.*?/Source-Code/Application-Code/", "SF:Source-Code/Application-Code/", txt)
+
+          p.write_text(txt, encoding="utf-8")
+          print("normalized:", p)
+          PY
+
       - name: Verify lcov exists
         shell: bash
         run: |
           test -f "${{ env.APP_DIR }}/coverage/lcov.info" \
             && echo "✅ lcov found" \
             || (echo "❌ lcov missing" && exit 1)
+
+      - name: Peek lcov paths
+        shell: bash
+        run: |
+          echo "---- first 40 lines of lcov ----"
+          sed -n '1,40p' "${{ env.APP_DIR }}/coverage/lcov.info"
+          echo "---- sample SF lines ----"
+          grep -n "^SF:" "${{ env.APP_DIR }}/coverage/lcov.info" | head -n 10
 
       - name: SonarQube Local Scan
         uses: SonarSource/sonarqube-scan-action@v5.0.0
@@ -147,11 +175,14 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONARQUBE_TOKEN }}
         with:
           args: >
-            -Dsonar.projectKey=${{ github.repository_owner }}_${{ github.event.repository.name }}_local
-            -Dsonar.projectName=netflix-clone-local
-            -Dsonar.sources=${{ env.APP_DIR }}/src
+            -Dsonar.projectKey=sohila12_netflix-clone-devsecops-mirror_local
+            -Dsonar.projectName=sohila12-netflix-clone-devsecops-mirror-local
+            -Dsonar.sources=Source-Code/Application-Code/src
+            -Dsonar.tests=Source-Code/Application-Code/src
+            -Dsonar.test.inclusions=**/*.test.ts,**/*.test.tsx,**/*.spec.ts,**/*.spec.tsx
+            -Dsonar.coverage.exclusions=**/*.test.*,**/*.spec.*,**/setupTests.*,**/vite-env.d.ts
             -Dsonar.exclusions=**/node_modules/**,**/dist/**,**/build/**,**/coverage/**,**/*.min.js
-            -Dsonar.javascript.lcov.reportPaths=${{ env.APP_DIR }}/coverage/lcov.info
+            -Dsonar.javascript.lcov.reportPaths=Source-Code/Application-Code/coverage/lcov.info
 
   owasp_dependency_check:
     runs-on: ubuntu-latest
