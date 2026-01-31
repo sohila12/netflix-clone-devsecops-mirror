@@ -118,10 +118,12 @@ jobs:
 
       - name: Install deps
         working-directory: ${{ env.APP_DIR }}
+        shell: bash
         run: npm ci
 
       - name: Run tests with coverage (Vitest)
         working-directory: ${{ env.APP_DIR }}
+        shell: bash
         run: npm run test:coverage
 
       - name: Normalize lcov paths for SonarQube (Windows runner)
@@ -134,7 +136,10 @@ jobs:
           p = Path(r"${{ env.APP_DIR }}/coverage/lcov.info")
           txt = p.read_text(encoding="utf-8")
 
+          # 1) backslashes -> slashes
           txt = txt.replace("\\\\", "/")
+
+          # 2) make SF: relative from Source-Code/Application-Code/
           txt = re.sub(r"SF:.*?/Source-Code/Application-Code/", "SF:Source-Code/Application-Code/", txt)
 
           p.write_text(txt, encoding="utf-8")
@@ -156,7 +161,6 @@ jobs:
           echo "---- sample SF lines ----"
           grep -n "^SF:" "${{ env.APP_DIR }}/coverage/lcov.info" | head -n 10
 
-      # ✅ SonarQube step (as requested)
       - name: SonarQube scan (local)
         uses: SonarSource/sonarqube-scan-action@v5.0.0
         env:
@@ -204,7 +208,22 @@ jobs:
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         run: |
-          if [ -z "${SLACK_WEBHOOK_URL}" ]; then exit 0; fi
+          if [ -z "${SLACK_WEBHOOK_URL}" ]; then
+            echo "SLACK_WEBHOOK_URL not set - skipping"
+            exit 0
+          fi
           curl -X POST -H 'Content-type: application/json' \
             --data "{\"text\":\"❌ DevSecOps pipeline failed on ${GITHUB_REPOSITORY} @ ${GITHUB_SHA::7}.\"}" \
             "${SLACK_WEBHOOK_URL}"
+
+      - name: Notify Teams (optional)
+        env:
+          TEAMS_WEBHOOK_URL: ${{ secrets.TEAMS_WEBHOOK_URL }}
+        run: |
+          if [ -z "${TEAMS_WEBHOOK_URL}" ]; then
+            echo "TEAMS_WEBHOOK_URL not set - skipping"
+            exit 0
+          fi
+          curl -H "Content-Type: application/json" \
+            -d "{\"text\":\"❌ DevSecOps pipeline failed on ${GITHUB_REPOSITORY} @ ${GITHUB_SHA::7}.\"}" \
+            "${TEAMS_WEBHOOK_URL}"
