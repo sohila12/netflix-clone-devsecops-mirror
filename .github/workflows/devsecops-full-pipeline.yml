@@ -70,23 +70,18 @@ jobs:
           TAG: ${{ steps.vars.outputs.tag }}
         run: |
           set -euo pipefail
-
           BRANCH="gitops/deploy-${TAG}"
           FILE="Kubernetes/deployment.yml"
-
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-
           git add "$FILE"
           if git diff --cached --quiet; then
             echo "No manifest changes. Skipping."
             exit 0
           fi
-
           git checkout -b "$BRANCH"
           git commit -m "chore(gitops): deploy image ${TARGET_REPO}:${TAG}"
           git push -u origin "$BRANCH"
-
           echo "=================================================="
           echo "Branch pushed: $BRANCH"
           echo "Create PR manually:"
@@ -132,16 +127,10 @@ jobs:
           python - <<'PY'
           import re
           from pathlib import Path
-
           p = Path(r"${{ env.APP_DIR }}/coverage/lcov.info")
           txt = p.read_text(encoding="utf-8")
-
-          # 1) backslashes -> slashes
           txt = txt.replace("\\\\", "/")
-
-          # 2) make SF: relative from Source-Code/Application-Code/
           txt = re.sub(r"SF:.*?/Source-Code/Application-Code/", "SF:Source-Code/Application-Code/", txt)
-
           p.write_text(txt, encoding="utf-8")
           print("normalized:", p)
           PY
@@ -161,7 +150,18 @@ jobs:
           echo "---- sample SF lines ----"
           grep -n "^SF:" "${{ env.APP_DIR }}/coverage/lcov.info" | head -n 10
 
-      - name: SonarQube scan (local)
+      - name: Assert SONAR_TOKEN exists
+        shell: bash
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          if [ -z "${SONAR_TOKEN:-}" ]; then
+            echo "SONAR_TOKEN is MISSING"
+            exit 1
+          fi
+          echo "SONAR_TOKEN is present"
+
+      - name: SonarQube Scan (local)
         uses: SonarSource/sonarqube-scan-action@v5.0.0
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
