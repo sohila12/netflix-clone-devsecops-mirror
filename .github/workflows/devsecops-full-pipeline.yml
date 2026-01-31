@@ -93,8 +93,9 @@ jobs:
           echo "https://github.com/${GITHUB_REPOSITORY}/pull/new/${BRANCH}"
           echo "=================================================="
 
-  sonarcloud:
-    runs-on: ubuntu-latest
+  sonarqube_local:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: self-hosted
     needs: [mirror_trivy_push_gitops]
 
     steps:
@@ -103,18 +104,17 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Validate Sonar vars
+      - name: Verify SonarQube is reachable (local)
+        shell: bash
         run: |
-          if [ -z "${{ vars.SONAR_ORG }}" ]; then
-            echo "ERROR: vars.SONAR_ORG is missing."
-            echo "Go to: Settings -> Secrets and variables -> Actions -> Variables"
-            echo "Add variable SONAR_ORG with your SonarCloud organization key."
-            exit 1
-          fi
-          if [ -z "${{ secrets.SONAR_TOKEN }}" ]; then
-            echo "ERROR: secrets.SONAR_TOKEN is missing."
-            exit 1
-          fi
+          curl -I http://localhost:9000 | head -n 5
+
+      - name: Recognize App path
+        shell: bash
+        run: |
+          echo "APP_DIR=${{ env.APP_DIR }}"
+          ls -la "${{ env.APP_DIR }}" | head
+          test -d "${{ env.APP_DIR }}/src" && echo "✅ src exists" || (echo "❌ src missing" && exit 1)
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -123,21 +123,35 @@ jobs:
           cache: "npm"
           cache-dependency-path: ${{ env.APP_DIR }}/package-lock.json
 
-      - name: Install deps (for analysis)
+      - name: Install deps
         working-directory: ${{ env.APP_DIR }}
+        shell: bash
         run: npm ci
 
-      - name: SonarCloud scan
+      - name: Run tests with coverage (Vitest)
+        working-directory: ${{ env.APP_DIR }}
+        shell: bash
+        run: npm run test:coverage
+
+      - name: Verify lcov exists
+        shell: bash
+        run: |
+          test -f "${{ env.APP_DIR }}/coverage/lcov.info" \
+            && echo "✅ lcov found" \
+            || (echo "❌ lcov missing" && exit 1)
+
+      - name: SonarQube Local Scan
         uses: SonarSource/sonarqube-scan-action@v5.0.0
         env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: http://localhost:9000
+          SONAR_TOKEN: ${{ secrets.SONARQUBE_TOKEN }}
         with:
           args: >
-            -Dsonar.organization=${{ vars.SONAR_ORG }}
-            -Dsonar.projectKey=${{ github.repository_owner }}_${{ github.event.repository.name }}
-            -Dsonar.sources=${{ env.APP_DIR }}
-            -Dsonar.exclusions=**/node_modules/**,**/dist/**,**/build/**,**/*.min.js
-            -Dsonar.javascript.node.maxspace=4096
+            -Dsonar.projectKey=${{ github.repository_owner }}_${{ github.event.repository.name }}_local
+            -Dsonar.projectName=${{ github.repository }} (local)
+            -Dsonar.sources=${{ env.APP_DIR }}/src
+            -Dsonar.exclusions=**/node_modules/**,**/dist/**,**/build/**,**/coverage/**,**/*.min.js
+            -Dsonar.javascript.lcov.reportPaths=${{ env.APP_DIR }}/coverage/lcov.info
 
   owasp_dependency_check:
     runs-on: ubuntu-latest
@@ -163,7 +177,7 @@ jobs:
 
   notify_on_failure:
     runs-on: ubuntu-latest
-    needs: [mirror_trivy_push_gitops, sonarcloud, owasp_dependency_check]
+    needs: [mirror_trivy_push_gitops, sonarqube_local, owasp_dependency_check]
     if: failure()
 
     steps:
