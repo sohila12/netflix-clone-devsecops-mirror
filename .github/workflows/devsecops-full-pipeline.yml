@@ -19,6 +19,7 @@ env:
   AWS_ACCOUNT_ID: "734468801857"
   ECR_REGISTRY: 734468801857.dkr.ecr.us-east-1.amazonaws.com
   ECR_REPO: nti_project
+
   S3_BUCKET: netflix-clone-devsecops-artifacts-734468801857
   S3_PREFIX: netflix-clone-devsecops-mirror
 
@@ -124,7 +125,6 @@ jobs:
           echo "✅ Updated image to: $NEW_IMAGE"
           echo "---- image lines (if any) ----"
           grep -nE '^\s*image:\s*' "$FILE" | head -n 10 || true
-
 
       - name: Commit & push GitOps branch (manual PR link)
         env:
@@ -255,9 +255,69 @@ jobs:
           aws s3 cp "reports" "${DEST}" --recursive
           echo "✅ Uploaded: ${DEST}"
 
+  argocd_results:
+    runs-on: self-hosted
+    needs: [mirror_trivy_push_gitops]
+    if: always()
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Prepare output dir
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p argocd-results
+
+      - name: Collect ArgoCD results
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          # quick diagnostics
+          echo "== argocd version =="
+          argocd version || true
+
+          echo "== kubectl version (client) =="
+          kubectl version --client || true
+
+          # Collect app info
+          argocd app get netflix -o json > argocd-results/argocd-app-get.json
+          argocd app get netflix -o yaml > argocd-results/argocd-app-get.yaml
+
+          # diff may exit non-zero when there are changes -> keep job alive
+          argocd app diff netflix > argocd-results/argocd-app-diff.txt || true
+
+          # cluster snapshot (optional)
+          kubectl -n netflix get all -o wide > argocd-results/k8s-get-all.txt || true
+
+      - name: Upload ArgoCD results (artifact)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: argocd-results
+          path: argocd-results
+
+      - name: Configure AWS credentials (for S3 upload)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Upload ArgoCD results to S3
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          DEST="s3://${S3_BUCKET}/${S3_PREFIX}/argocd/${GITHUB_RUN_ID}/${GITHUB_SHA::7}/"
+          aws s3 cp "argocd-results" "${DEST}" --recursive
+          echo "✅ Uploaded: ${DEST}"
+
   notify_on_failure:
     runs-on: ubuntu-latest
-    needs: [mirror_trivy_push_gitops, sonarqube_local, owasp_dependency_check]
+    needs: [mirror_trivy_push_gitops, sonarqube_local, owasp_dependency_check, argocd_results]
     if: failure()
 
     steps:
