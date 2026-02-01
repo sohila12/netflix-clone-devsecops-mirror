@@ -19,6 +19,8 @@ env:
   AWS_ACCOUNT_ID: "734468801857"
   ECR_REGISTRY: 734468801857.dkr.ecr.us-east-1.amazonaws.com
   ECR_REPO: nti_project
+  S3_BUCKET: netflix-clone-devsecops-artifacts-734468801857
+  S3_PREFIX: netflix-clone-devsecops-mirror
 
 jobs:
   mirror_trivy_push_gitops:
@@ -83,6 +85,16 @@ jobs:
         with:
           name: trivy-image-report
           path: trivy-image-report.txt
+
+
+      - name: Upload Trivy report to S3
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          KEY="/trivy///trivy-image-report.txt"
+          aws s3 cp "trivy-image-report.txt" "s3:///"
+          echo "✅ Uploaded: s3:///"
 
       - name: Push image to ECR
         run: docker push "${ECR_IMAGE}"
@@ -206,6 +218,23 @@ jobs:
         with:
           name: owasp-dependency-check-report
           path: reports
+
+
+      - name: Configure AWS credentials (for S3 upload)
+        uses: aws-actions/configure-aws-credentials
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Upload OWASP report to S3
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          DEST="s3:////owasp///"
+          aws s3 cp "reports" "" --recursive
+          echo "✅ Uploaded: "
 
   notify_on_failure:
     runs-on: ubuntu-latest
