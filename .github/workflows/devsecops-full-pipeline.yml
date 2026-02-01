@@ -270,27 +270,27 @@ jobs:
           set -euo pipefail
           mkdir -p argocd-results
 
-      - name: Collect ArgoCD results
+      - name: Collect ArgoCD results (kubectl only)
         shell: bash
         run: |
           set -euo pipefail
 
-          # quick diagnostics
-          echo "== argocd version =="
-          argocd version || true
-
           echo "== kubectl version (client) =="
           kubectl version --client || true
 
-          # Collect app info
-          argocd app get netflix -o json > argocd-results/argocd-app-get.json
-          argocd app get netflix -o yaml > argocd-results/argocd-app-get.yaml
+          # ✅ ArgoCD Application CR (ده أهم حاجة)
+          kubectl -n argocd get application netflix -o json > argocd-results/application.json
+          kubectl -n argocd get application netflix -o yaml > argocd-results/application.yaml
 
-          # diff may exit non-zero when there are changes -> keep job alive
-          argocd app diff netflix > argocd-results/argocd-app-diff.txt || true
-
-          # cluster snapshot (optional)
+          # ✅ حالة الـ resources
           kubectl -n netflix get all -o wide > argocd-results/k8s-get-all.txt || true
+          kubectl -n netflix get deploy,pod,svc,ingress -o wide > argocd-results/k8s-core.txt || true
+
+          # ✅ Events تساعدك تفهمي أي مشكلة
+          kubectl -n netflix get events --sort-by=.lastTimestamp > argocd-results/k8s-events.txt || true
+
+          echo "✅ Collected ArgoCD/K8s snapshots using kubectl."
+
 
       - name: Upload ArgoCD results (artifact)
         if: always()
