@@ -106,11 +106,25 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+
           FILE="Kubernetes/deployment.yml"
           NEW_IMAGE="${{ env.ECR_IMAGE }}"
+
+          if [ ! -f "$FILE" ]; then
+            echo "❌ File not found: $FILE"
+            echo "Repo tree (top-level):"
+            ls -la
+            echo "Kubernetes dir (if exists):"
+            ls -la Kubernetes || true
+            exit 1
+          fi
+
           perl -0777 -pi -e "s|(^\\s*image:\\s*).*$|\\1$NEW_IMAGE|mg" "$FILE"
-          echo "Updated image to: $NEW_IMAGE"
-          grep -n "image:" "$FILE" | head -n 5
+
+          echo "✅ Updated image to: $NEW_IMAGE"
+          echo "---- image lines (if any) ----"
+          grep -nE '^\s*image:\s*' "$FILE" | head -n 10 || true
+
 
       - name: Commit & push GitOps branch (manual PR link)
         env:
