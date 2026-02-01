@@ -13,8 +13,12 @@ permissions:
 
 env:
   SOURCE_IMAGE: mostafagheta/netflix-clone:latest
-  TARGET_REPO: sohila11/netflix-clone
   APP_DIR: Source-Code/Application-Code
+
+  AWS_REGION: us-east-1
+  AWS_ACCOUNT_ID: "734468801857"
+  ECR_REGISTRY: 734468801857.dkr.ecr.us-east-1.amazonaws.com
+  ECR_REPO: nti_project
 
 jobs:
   mirror_trivy_push_gitops:
@@ -32,35 +36,43 @@ jobs:
           SHORT_SHA="${GITHUB_SHA::7}"
           echo "tag=main-${SHORT_SHA}" >> "$GITHUB_OUTPUT"
 
-      - name: Login to DockerHub
-        uses: docker/login-action@v3
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
         with:
-          username: ${{ vars.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v2
 
       - name: Pull source image (Mostafa)
         run: docker pull "${SOURCE_IMAGE}"
 
-      - name: Tag image for my DockerHub
-        run: docker tag "${SOURCE_IMAGE}" "${TARGET_REPO}:${{ steps.vars.outputs.tag }}"
+      - name: Tag image for ECR
+        run: |
+          ECR_IMAGE="${ECR_REGISTRY}/${ECR_REPO}:${{ steps.vars.outputs.tag }}"
+          docker tag "${SOURCE_IMAGE}" "${ECR_IMAGE}"
+          echo "ECR_IMAGE=${ECR_IMAGE}" >> $GITHUB_ENV
+          echo "Using ECR_IMAGE=${ECR_IMAGE}"
 
       - name: Trivy scan (image)
         uses: aquasecurity/trivy-action@b6643a29fecd7f34b3597bc6acb0a98b03d33ff8
         with:
-          image-ref: "${{ env.TARGET_REPO }}:${{ steps.vars.outputs.tag }}"
+          image-ref: "${{ env.ECR_IMAGE }}"
           format: "table"
           exit-code: "0"
           vuln-type: "os,library"
           severity: "CRITICAL,HIGH,MEDIUM"
 
-      - name: Push image to my DockerHub
-        run: docker push "${TARGET_REPO}:${{ steps.vars.outputs.tag }}"
+      - name: Push image to ECR
+        run: docker push "${ECR_IMAGE}"
 
       - name: Update K8s deployment image (GitOps change)
         run: |
           set -e
           FILE="Kubernetes/deployment.yml"
-          NEW_IMAGE="${TARGET_REPO}:${{ steps.vars.outputs.tag }}"
+          NEW_IMAGE="${{ env.ECR_IMAGE }}"
           perl -0777 -pi -e "s|(^\\s*image:\\s*).*$|\\1$NEW_IMAGE|mg" "$FILE"
           echo "Updated image to: $NEW_IMAGE"
           grep -n "image:" "$FILE" | head -n 5
@@ -84,7 +96,7 @@ jobs:
           fi
 
           git checkout -b "$BRANCH"
-          git commit -m "chore(gitops): deploy image ${TARGET_REPO}:${TAG}"
+          git commit -m "chore(gitops): deploy image ${ECR_IMAGE}"
           git push -u origin "$BRANCH"
 
           echo "=================================================="
@@ -182,7 +194,7 @@ jobs:
     if: failure()
 
     steps:
-      - name: Notify Slack (optional)
+      - name: Notify Slack
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         run: |
@@ -194,7 +206,7 @@ jobs:
             --data "{\"text\":\"❌ DevSecOps pipeline failed on ${GITHUB_REPOSITORY} @ ${GITHUB_SHA::7}.\"}" \
             "${SLACK_WEBHOOK_URL}"
 
-      - name: Notify Teams (optional)
+      - name: Notify Teams
         env:
           TEAMS_WEBHOOK_URL: ${{ secrets.TEAMS_WEBHOOK_URL }}
         run: |
