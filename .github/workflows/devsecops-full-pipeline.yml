@@ -65,10 +65,12 @@ jobs:
           echo "ECR_IMAGE=${ECR_IMAGE}" >> $GITHUB_ENV
           echo "Using ECR_IMAGE=${ECR_IMAGE}"
 
-      - name: Trivy scan (image)
+      # ✅ Trivy now scans vulnerabilities + secrets, and saves report as artifact
+      - name: Trivy scan (vuln + secret)
         uses: aquasecurity/trivy-action@b6643a29fecd7f34b3597bc6acb0a98b03d33ff8
         with:
           image-ref: "${{ env.ECR_IMAGE }}"
+          scanners: "vuln,secret"
           format: "table"
           output: "trivy-image-report.txt"
           exit-code: "0"
@@ -76,6 +78,7 @@ jobs:
           severity: "CRITICAL,HIGH,MEDIUM"
 
       - name: Upload Trivy report (artifact)
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: trivy-image-report
