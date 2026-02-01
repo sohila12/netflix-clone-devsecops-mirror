@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: netflix
-          image: 734468801857.dkr.ecr.us-east-1.amazonaws.com/nti_project:latest
+{4468801857.dkr.ecr.us-east-1.amazonaws.com/nti_project:main-35c1955
           imagePullPolicy: Always
           ports:
             - containerPort: 80
