@@ -36,6 +36,12 @@ jobs:
           SHORT_SHA="${GITHUB_SHA::7}"
           echo "tag=main-${SHORT_SHA}" >> "$GITHUB_OUTPUT"
 
+      - name: Debug AWS secrets presence
+        shell: bash
+        run: |
+          test -n "${{ secrets.AWS_ACCESS_KEY_ID }}" && echo "✅ AWS_ACCESS_KEY_ID exists" || (echo "❌ AWS_ACCESS_KEY_ID missing" && exit 1)
+          test -n "${{ secrets.AWS_SECRET_ACCESS_KEY }}" && echo "✅ AWS_SECRET_ACCESS_KEY exists" || (echo "❌ AWS_SECRET_ACCESS_KEY missing" && exit 1)
+
       - name: Configure AWS credentials (IAM User)
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -64,9 +70,16 @@ jobs:
         with:
           image-ref: "${{ env.ECR_IMAGE }}"
           format: "table"
+          output: "trivy-image-report.txt"
           exit-code: "0"
           vuln-type: "os,library"
           severity: "CRITICAL,HIGH,MEDIUM"
+
+      - name: Upload Trivy report (artifact)
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-image-report
+          path: trivy-image-report.txt
 
       - name: Push image to ECR
         run: docker push "${ECR_IMAGE}"
