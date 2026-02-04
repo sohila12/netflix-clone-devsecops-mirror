@@ -133,7 +133,7 @@ jobs:
           fi
 
           git commit -m "chore(gitops): deploy image ${ECR_IMAGE}"
-          git push origin "$BRANCH"
+          git push origin "$BRANCH" --force-with-lease
 
           echo "✅ Pushed branch: $BRANCH"
           echo "branch=$BRANCH" >> "$GITHUB_OUTPUT"
