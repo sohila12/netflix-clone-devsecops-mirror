@@ -1,29 +1,53 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: netflix
-  labels:
-    app: netflix
+  name: netflix-clone
+  namespace: netflix
 spec:
-  replicas: 1
+  replicas: 3
   selector:
     matchLabels:
-      app: netflix
+      app: netflix-clone
   template:
     metadata:
       labels:
-        app: netflix
+        app: netflix-clone
     spec:
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels:
+              app: netflix-clone
       containers:
-        - name: netflix
-          image: sohila11/netflix-clone:latest
-          imagePullPolicy: Always
+        - name: web
+          image: 734468801857.dkr.ecr.eu-central-1.amazonaws.com/nti_project:latest
           ports:
             - containerPort: 80
+
           resources:
             requests:
               cpu: "100m"
-              memory: "128Mi"
-            limits:
-              cpu: "300m"
               memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 10
+
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 15
+            periodSeconds: 20
+
+          envFrom:
+            - secretRef:
+                name: netflix-api-secret
