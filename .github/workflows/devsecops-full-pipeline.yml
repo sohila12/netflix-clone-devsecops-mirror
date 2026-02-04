@@ -10,14 +10,15 @@ on:
 permissions:
   contents: write
   pull-requests: write
+  id-token: write
 
 env:
   SOURCE_IMAGE: mostafagheta/netflix-clone:latest
   APP_DIR: Source-Code/Application-Code
 
-  AWS_REGION: us-east-1
+  AWS_REGION: eu-central-1
   AWS_ACCOUNT_ID: "734468801857"
-  ECR_REGISTRY: 734468801857.dkr.ecr.us-east-1.amazonaws.com
+  ECR_REGISTRY: 734468801857.dkr.ecr.eu-central-1.amazonaws.com
   ECR_REPO: nti_project
 
   S3_BUCKET: netflix-clone-devsecops-artifacts-734468801857
@@ -28,6 +29,8 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       image_tag: ${{ steps.vars.outputs.tag }}
+      ecr_image: ${{ steps.tag.outputs.ecr_image }}
+      gitops_branch: ${{ steps.gitops.outputs.branch }}
 
     steps:
       - name: Checkout
@@ -40,13 +43,7 @@ jobs:
           SHORT_SHA="${GITHUB_SHA::7}"
           echo "tag=main-${SHORT_SHA}" >> "$GITHUB_OUTPUT"
 
-      - name: Debug AWS secrets presence
-        shell: bash
-        run: |
-          test -n "${{ secrets.AWS_ACCESS_KEY_ID }}" && echo "✅ AWS_ACCESS_KEY_ID exists" || (echo "❌ AWS_ACCESS_KEY_ID missing" && exit 1)
-          test -n "${{ secrets.AWS_SECRET_ACCESS_KEY }}" && echo "✅ AWS_SECRET_ACCESS_KEY exists" || (echo "❌ AWS_SECRET_ACCESS_KEY missing" && exit 1)
-
-      - name: Configure AWS credentials (IAM User)
+      - name: Configure AWS credentials (IAM User Keys)
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -65,11 +62,13 @@ jobs:
         run: docker pull "${SOURCE_IMAGE}"
 
       - name: Tag image for ECR
+        id: tag
         shell: bash
         run: |
           ECR_IMAGE="${ECR_REGISTRY}/${ECR_REPO}:${{ steps.vars.outputs.tag }}"
           docker tag "${SOURCE_IMAGE}" "${ECR_IMAGE}"
           echo "ECR_IMAGE=${ECR_IMAGE}" >> "$GITHUB_ENV"
+          echo "ecr_image=${ECR_IMAGE}" >> "$GITHUB_OUTPUT"
           echo "Using ECR_IMAGE=${ECR_IMAGE}"
 
       - name: Trivy scan (vuln + secret)
@@ -103,57 +102,41 @@ jobs:
         shell: bash
         run: docker push "${ECR_IMAGE}"
 
-      - name: Update K8s deployment image (GitOps change)
+      - name: "GitOps: commit manifest change (unique branch)"
+        id: gitops
         shell: bash
         run: |
           set -euo pipefail
 
           FILE="Kubernetes/deployment.yml"
-          NEW_IMAGE="${{ env.ECR_IMAGE }}"
-
-          if [ ! -f "$FILE" ]; then
-            echo "❌ File not found: $FILE"
-            echo "Repo tree (top-level):"
-            ls -la
-            echo "Kubernetes dir (if exists):"
-            ls -la Kubernetes || true
-            exit 1
-          fi
-
-          perl -0777 -pi -e "s|(^\\s*image:\\s*).*$|\\1$NEW_IMAGE|mg" "$FILE"
-
-          echo "✅ Updated image to: $NEW_IMAGE"
-          echo "---- image lines (if any) ----"
-          grep -nE '^\s*image:\s*' "$FILE" | head -n 10 || true
-
-      - name: Commit & push GitOps branch (manual PR link)
-        env:
-          TAG: ${{ steps.vars.outputs.tag }}
-        shell: bash
-        run: |
-          set -euo pipefail
-
-          BRANCH="gitops/deploy-${TAG}"
-          FILE="Kubernetes/deployment.yml"
+          SHORT_SHA="${GITHUB_SHA::7}"
+          BRANCH="gitops/deploy-main-${SHORT_SHA}-${GITHUB_RUN_ID}"
 
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
+          git checkout -b "$BRANCH"
+
+          test -f "$FILE" || (echo "❌ File not found: $FILE" && exit 1)
+          test -n "${ECR_IMAGE:-}" || (echo "❌ ECR_IMAGE is empty" && exit 1)
+
+          perl -0777 -pi -e "s|(^\\s*image:\\s*).*$|\\1$ECR_IMAGE|mg" "$FILE"
+
+          echo "✅ Updated image to: $ECR_IMAGE"
+          grep -nE '^\s*image:\s*' "$FILE" | head -n 10 || true
+
           git add "$FILE"
           if git diff --cached --quiet; then
             echo "No manifest changes. Skipping."
+            echo "branch=$BRANCH" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
-          git checkout -b "$BRANCH"
           git commit -m "chore(gitops): deploy image ${ECR_IMAGE}"
-          git push -u origin "$BRANCH"
+          git push origin "$BRANCH"
 
-          echo "=================================================="
-          echo "Branch pushed: $BRANCH"
-          echo "Create PR manually:"
-          echo "https://github.com/${GITHUB_REPOSITORY}/pull/new/${BRANCH}"
-          echo "=================================================="
+          echo "✅ Pushed branch: $BRANCH"
+          echo "branch=$BRANCH" >> "$GITHUB_OUTPUT"
 
   sonarqube_local:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
@@ -239,7 +222,7 @@ jobs:
           name: owasp-dependency-check-report
           path: reports
 
-      - name: Configure AWS credentials (for S3 upload)
+      - name: Configure AWS credentials (IAM User Keys)
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -270,27 +253,46 @@ jobs:
           set -euo pipefail
           mkdir -p argocd-results
 
-      - name: Collect ArgoCD results (kubectl only)
+      - name: Configure AWS credentials (IAM User Keys)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ vars.EKS_REGION }}
+
+      - name: Update kubeconfig for EKS (REQUIRED)
         shell: bash
         run: |
           set -euo pipefail
+          test -n "${{ vars.EKS_CLUSTER_NAME }}" || (echo "❌ Missing vars.EKS_CLUSTER_NAME" && exit 1)
+          test -n "${{ vars.EKS_REGION }}" || (echo "❌ Missing vars.EKS_REGION" && exit 1)
 
-          echo "== kubectl version (client) =="
-          kubectl version --client || true
+          aws sts get-caller-identity
+          aws eks update-kubeconfig --region "${{ vars.EKS_REGION }}" --name "${{ vars.EKS_CLUSTER_NAME }}"
+          kubectl config current-context
+          kubectl get nodes -o wide
 
-          # ✅ ArgoCD Application CR (ده أهم حاجة)
-          kubectl -n argocd get application netflix -o json > argocd-results/application.json
-          kubectl -n argocd get application netflix -o yaml > argocd-results/application.yaml
+      - name: Collect ArgoCD + K8s snapshots (EKS)
+        shell: bash
+        env:
+          ARGOCD_NAMESPACE: ${{ vars.ARGOCD_NAMESPACE }}
+          ARGOCD_APP_NAME: ${{ vars.ARGOCD_APP_NAME }}
+          APP_NAMESPACE: ${{ vars.APP_NAMESPACE }}
+        run: |
+          set -euo pipefail
 
-          # ✅ حالة الـ resources
-          kubectl -n netflix get all -o wide > argocd-results/k8s-get-all.txt || true
-          kubectl -n netflix get deploy,pod,svc,ingress -o wide > argocd-results/k8s-core.txt || true
+          ARGOCD_NAMESPACE="${ARGOCD_NAMESPACE:-argocd}"
+          ARGOCD_APP_NAME="${ARGOCD_APP_NAME:-netflix}"
+          APP_NAMESPACE="${APP_NAMESPACE:-netflix}"
 
-          # ✅ Events تساعدك تفهمي أي مشكلة
-          kubectl -n netflix get events --sort-by=.lastTimestamp > argocd-results/k8s-events.txt || true
+          kubectl -n "$ARGOCD_NAMESPACE" get application "$ARGOCD_APP_NAME" -o json > argocd-results/application.json
+          kubectl -n "$ARGOCD_NAMESPACE" get application "$ARGOCD_APP_NAME" -o yaml > argocd-results/application.yaml
 
-          echo "✅ Collected ArgoCD/K8s snapshots using kubectl."
+          kubectl -n "$APP_NAMESPACE" get all -o wide > argocd-results/k8s-get-all.txt || true
+          kubectl -n "$APP_NAMESPACE" get deploy,pod,svc,ingress -o wide > argocd-results/k8s-core.txt || true
+          kubectl -n "$APP_NAMESPACE" get events --sort-by=.lastTimestamp > argocd-results/k8s-events.txt || true
 
+          echo "✅ Collected EKS snapshots."
 
       - name: Upload ArgoCD results (artifact)
         if: always()
@@ -298,13 +300,6 @@ jobs:
         with:
           name: argocd-results
           path: argocd-results
-
-      - name: Configure AWS credentials (for S3 upload)
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
 
       - name: Upload ArgoCD results to S3
         if: always()
