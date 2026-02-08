@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="images/logos/nti-logo.png" height="120"/>
+  <img src="images/logos/v2-logo.jpg" height="140" alt="Project Logo"/>
 </p>
 
 <h1 align="center">
