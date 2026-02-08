@@ -433,7 +433,6 @@ kubectl port-forward svc/argocd-server -n argocd 8080:443
 <p align="center">
   <img src="images/screenshots/github-secrets.png"/>
 </p>
-
 ---
 ## 📦 Step 9: Create ArgoCD Application
 ```bash
