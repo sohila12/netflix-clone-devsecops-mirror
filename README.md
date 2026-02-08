@@ -439,6 +439,19 @@ kubectl -n argocd get secret argocd-initial-admin-secret \
 
 kubectl port-forward svc/argocd-server -n argocd 8080:443
 ```
+### 📂 ArgoCD Namespace
+
+The ArgoCD namespace contains the controllers responsible for GitOps synchronization and application deployment.
+
+```bash
+kubectl get ns | grep argocd
+```
+
+<p align="center"> 
+  <img src="images/screenshots/argocd-namespace.jpg" alt="ArgoCD Namespace"/> 
+</p> 
+
+---
 
 ## 🔐 Step 8: Configure GitHub Secrets
 
