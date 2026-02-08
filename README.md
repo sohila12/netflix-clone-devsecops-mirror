@@ -727,13 +727,44 @@ At this stage:
 > [!TIP]
 > Click on the links below to explore the detailed technical documentation.
 
-* 📘 **[Setup Guide](./docs/setup.md)** – Cluster & infrastructure provisioning steps.
-* 🔧 **[Configuration](./docs/config.md)** – Detailed CI/CD and GitOps settings.
-* 🏗️ **[Architecture](./docs/arch.md)** – System design and workflow explanation.
-* 🔒 **[Security](./docs/security.md)** – Hardening practices and tool configurations.
+* 🏗️ **Architecture Diagram (Draw.io)**  
+  👉 [View Kubernetes Architecture Diagram (PDF)](./docs/architecture/k8s-architecture.drawio.pdf)
 
 ---
 
+## 👥 Project Team
+
+This project was developed as a collaborative **DevOps Graduation Project**, with contributions from the following team members:
+
+<table>
+<tr>
+<td align="center">
+
+### 👨‍💻 Mostafa Ghetta  
+🔗 [GitHub Profile](https://github.com/mostafagheta)
+
+</td>
+<td align="center">
+
+### 👨‍💻 Marwan Alaa  
+🔗 [GitHub Profile](https://github.com/marwanalaa8)
+
+</td>
+<td align="center">
+
+### 👩‍💻 Sohila Hosam  
+🔗 [GitHub Profile](https://github.com/sohila12)
+
+### 👩‍💻 Nouran Mahmoud  
+🔗 [GitHub Profile](https://github.com/nouranmahmoud123)
+
+</td>
+</tr>
+</table>
+
+> 🤝 This collaboration reflects real-world DevOps teamwork, including CI/CD, GitOps workflows, infrastructure automation, and monitoring responsibilities.
+
+---
 ## 🤝 Acknowledgments
 
 > [!IMPORTANT]
@@ -754,9 +785,6 @@ This project represents a complete, **Production-Grade** implementation of moder
 <div align="center">
 
 ### 🌟 Star this repository if you found it helpful!
-
-**Sohila Hosam**
-[GitHub Profile](https://github.com/sohila12)
 
 ![Production Ready](https://img.shields.io/badge/Status-Production_Ready-success?style=for-the-badge)
 ![Maintained](https://img.shields.io/badge/Maintained-Yes-green?style=for-the-badge)
