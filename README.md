@@ -1,6 +1,12 @@
 <p align="center">
-  <img src="images/logos/v2-logo.jpg" height="140" alt="Project Logo"/>
+  <img 
+    src="images/logos/v2-logo.jpg"
+    alt="Netflix Clone Banner"
+    style="width: 100%; max-width: 1200px; height: auto;"
+  />
 </p>
+
+
 
 <h1 align="center">
   <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&size=35&duration=3000&pause=1000&color=00D9FF&center=true&vCenter=true&width=900&lines=End-to-End+Netflix+Clone+DevSecOps+Project;GitOps+%2B+AWS+EKS+%2B+ArgoCD;CI%2FCD+Pipeline+Automation;Observability+%7C+Prometheus+%2B+Grafana+%2B+Alertmanager" />
