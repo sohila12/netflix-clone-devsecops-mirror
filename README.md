@@ -410,6 +410,13 @@ Once the Docker image is available in Amazon ECR, the CI/CD pipeline automatical
 ```
 Scan → Tag → Push → Update Manifest → ArgoCD Sync → Deploy
 ```
+
+<p align="center">
+  <img src="images/screenshots/pipeline-results.png" alt="CI/CD Pipeline Results"/>
+</p>
+
+---
+
 ### 🔁 Pipeline Responsibilities
 
 | Step | Action | Tool |
@@ -767,6 +774,9 @@ This project was developed as a collaborative **DevOps Graduation Project**, wit
 
 ### 👩‍💻 Sohila Hosam  
 🔗 [GitHub Profile](https://github.com/sohila12)
+
+</td>
+<td align="center">
 
 ### 👩‍💻 Nouran Mahmoud  
 🔗 [GitHub Profile](https://github.com/nouranmahmoud123)
