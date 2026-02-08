@@ -431,8 +431,9 @@ kubectl port-forward svc/argocd-server -n argocd 8080:443
 | `SLACK_WEBHOOK_URL` | Alerts (optional) |
 
 <p align="center">
-  <img src="images/screenshots/github-secrets.png"/>
+  <img src="images/screenshots/github-secrets.png" alt="GitHub Secrets"/>
 </p>
+
 ---
 ## 📦 Step 9: Create ArgoCD Application
 ```bash
