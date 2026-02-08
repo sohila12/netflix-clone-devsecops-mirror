@@ -430,6 +430,10 @@ kubectl port-forward svc/argocd-server -n argocd 8080:443
 | `SONARQUBE_TOKEN` | SonarQube Scan |
 | `SLACK_WEBHOOK_URL` | Alerts (optional) |
 
+<p align="center">
+  <img src="images/screenshots/github-secrets.png"/>
+</p>
+
 ---
 ## 📦 Step 9: Create ArgoCD Application
 ```bash
