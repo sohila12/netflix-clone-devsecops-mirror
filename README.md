@@ -46,31 +46,52 @@
 
 <table align="center">
 <tr>
-<td align="center" width="33%">
 
-### 🏗️ **Infrastructure**
+<td align="center" valign="top" width="33%">
 
-- ✅ AWS VPC (Public/Private Subnets)
-- ✅ EKS Cluster + Node Groups
-- ✅ NAT Gateway + Internet Gateway
-- ✅ ALB Ingress Controller
-- ✅ Route 53 + ACM (TLS)
-- ✅ Cluster Autoscaler
+### 🏗️ **Infrastructure (AWS & Kubernetes)**
+
+- ✅ AWS VPC (Public & Private Subnets)
+- ✅ Internet Gateway & NAT Gateway
+- ✅ Amazon EKS Cluster
+- ✅ Managed Node Groups (Auto Scaling)
+- ✅ AWS ALB Ingress Controller
+- ✅ Route 53 + ACM (TLS Certificates)
 
 </td>
-<td align="center" width="33%">
 
-### ⚙️ **CI/CD Pipeline**
+<td align="center" valign="top" width="33%">
 
-- ✅ GitHub Actions
-- ✅ Docker Tag & Push (ECR)
-- ✅ Trivy (Vuln + Secrets)
+### ⚙️ **CI / DevSecOps Pipeline**
+
+- ✅ GitHub Actions (CI Orchestration)
+- ✅ Docker Build, Tag & Push
+- ✅ Amazon ECR (Image Registry)
+- ✅ Trivy (Vulnerability & Secrets Scan)
 - ✅ OWASP Dependency-Check
-- ✅ SonarQube (Self-Hosted)
-- ✅ Reports → Artifacts + S3
+- ✅ SonarQube (Static Code Analysis)
+- ✅ Reports as Artifacts + S3
 
 </td>
-<td align="center" width="33%">
+
+<td align="center" valign="top" width="33%">
+
+### 🔄 **CD & GitOps (Runtime)**
+
+- ✅ GitOps-based Deployment
+- ✅ Auto Manifest Update (Image Tags)
+- ✅ GitOps Branch per Pipeline Run
+- ✅ ArgoCD Auto-Sync
+- ✅ Self-Healing & Pruning
+- ✅ Rollback via Git History
+- ✅ Cluster Autoscaler (Runtime Scaling)
+
+</td>
+
+</tr>
+</table>
+
+---
 
 ### 🔄 **GitOps**
 
