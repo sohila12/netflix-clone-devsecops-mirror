@@ -1,3 +1,4 @@
+cat <<'EOF' > README.md
 <p align="center">
   <img src="images/logos/nti-logo.png" height="120"/>
 </p>
@@ -7,7 +8,7 @@
 </h1>
 
 <h3 align="center" style="color: #64B5F6;">
-  í¾“ DevOps Graduation Project â€” <strong>National Telecommunication Institute (NTI)</strong>
+  ğŸ“ DevOps Graduation Project â€” <strong>National Telecommunication Institute (NTI)</strong>
 </h3>
 
 <p align="center">
@@ -30,7 +31,7 @@
 </p>
 
 <p align="center" style="font-size: 1.15rem; line-height: 1.8; max-width: 900px; margin: 20px auto;">
-  í¾“ This project represents the <strong>culmination of DevOps training</strong> at the <br/>
+  ğŸ“ This project represents the <strong>culmination of DevOps training</strong> at the <br/>
   <strong>National Telecommunication Institute (NTI)</strong>. <br/>
   âœ¨ A complete production-ready <strong>DevSecOps + GitOps</strong> pipeline demonstrating modern cloud-native practices.
 </p>
@@ -39,7 +40,7 @@
 
 <div align="center">
 
-## íº€ **ArgoCD GitOps Deployment on AWS EKS**
+## ğŸš€ **ArgoCD GitOps Deployment on AWS EKS**
 ### *Using GitHub Actions & Amazon ECR*
 
 </div>
@@ -48,7 +49,7 @@
 <tr>
 <td align="center" width="33%">
 
-### í¿—ï¸ **Infrastructure**
+### ğŸ—ï¸ **Infrastructure**
 
 - âœ… AWS VPC (Public/Private Subnets)
 - âœ… EKS Cluster + Node Groups
@@ -72,7 +73,7 @@
 </td>
 <td align="center" width="33%">
 
-### í´„ **GitOps**
+### ğŸ”„ **GitOps**
 
 - âœ… Manifest Auto-Update
 - âœ… GitOps Branch per Run
@@ -86,7 +87,7 @@
 
 ---
 
-## í³ Architecture Overview
+## ğŸ“ Architecture Overview
 
 <div align="center">
 
@@ -94,13 +95,13 @@
 
 </div>
 
-### í¿›ï¸ **Components Breakdown**
+### ğŸ›ï¸ **Components Breakdown**
 
 <table>
 <tr>
 <td width="50%">
 
-#### í¼ **Network Layer**
+#### ğŸŒ **Network Layer**
 
 **Public Subnets:**
 - Internet Gateway
@@ -116,7 +117,7 @@
 </td>
 <td width="50%">
 
-#### í´„ **CI/CD Flow**
+#### ğŸ”„ **CI/CD Flow**
 
 **Automation Flow:**
 1. Code Push â†’ GitHub
@@ -131,26 +132,26 @@
 
 ---
 
-## í´¥ CI/CD Workflow Pipeline
+## ğŸ”¥ CI/CD Workflow Pipeline
 
 <div align="center">
 
 ```
 â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
-â”‚                         íº€ AUTOMATED DEPLOYMENT PIPELINE                      â”‚
+â”‚                         ğŸš€ AUTOMATED DEPLOYMENT PIPELINE                      â”‚
 â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
 ```
 
 </div>
 
-### í³ Step-by-Step Workflow
+### ğŸ“ Step-by-Step Workflow
 
 <table>
 <tr>
 <td width="10%" align="center"><h3>1ï¸âƒ£</h3></td>
 <td width="90%">
 
-**í±¨â€í²» Developer Push**
+**ğŸ‘¨â€ğŸ’» Developer Push**
 
 \`\`\`bash
 git add .
@@ -167,23 +168,23 @@ git push origin main
 <td width="10%" align="center"><h3>2ï¸âƒ£</h3></td>
 <td width="90%">
 
-**í´– GitHub Actions Pipeline**
+**ğŸ¤– GitHub Actions Pipeline**
 
 **Pipeline Steps:**
 
 | Step | Action | Tool |
 |:----:|--------|------|
-| í´ | Pull SOURCE_IMAGE | Docker |
-| í¿·ï¸ | Tag Image for ECR | AWS CLI |
-| í´ | Security Scan | Trivy |
-| í·ª | Dependency Check | OWASP |
+| ğŸ” | Pull SOURCE_IMAGE | Docker |
+| ğŸ·ï¸ | Tag Image for ECR | AWS CLI |
+| ğŸ” | Security Scan | Trivy |
+| ğŸ§ª | Dependency Check | OWASP |
 | âœ… | Code Quality | SonarQube |
-| í³¤ | Push to Registry | ECR |
-| í²¾ | Upload Reports | S3 + Artifacts |
-| í³ | Update Manifest | Git |
-| í´€ | Create GitOps Branch | GitHub |
+| ğŸ“¤ | Push to Registry | ECR |
+| ğŸ’¾ | Upload Reports | S3 + Artifacts |
+| ğŸ“ | Update Manifest | Git |
+| ğŸ”€ | Create GitOps Branch | GitHub |
 
-**í³Š Output:** New ECR image tagged with commit SHA
+**ğŸ“Š Output:** New ECR image tagged with commit SHA
 
 </td>
 </tr>
@@ -192,21 +193,21 @@ git push origin main
 <td width="10%" align="center"><h3>3ï¸âƒ£</h3></td>
 <td width="90%">
 
-**í´„ ArgoCD GitOps Sync**
+**ğŸ”„ ArgoCD GitOps Sync**
 
 ```
-í´ ArgoCD Detects Changes
+ğŸ” ArgoCD Detects Changes
         â†“
-í³Š Compares State
+ğŸ“Š Compares State
         â†“
-í´„ Auto-Sync Enabled
+ğŸ”„ Auto-Sync Enabled
         â†“
-íº€ Deploys to Amazon EKS
+ğŸš€ Deploys to Amazon EKS
         â†“
 âœ… Application Updated Successfully
 ```
 
-**í¾¯ Result:** Zero-downtime deployment with automatic rollback capability
+**ğŸ¯ Result:** Zero-downtime deployment with automatic rollback capability
 
 </td>
 </tr>
@@ -214,15 +215,15 @@ git push origin main
 
 ---
 
-## í³¸ Implementation Journey
+## ğŸ“¸ Implementation Journey
 
 <div align="center">
 
-### í» ï¸ Step-by-Step Setup Guide (with Evidence)
+### ğŸ› ï¸ Step-by-Step Setup Guide (with Evidence)
 
 </div>
 
-### í¿—ï¸ Step 1: Infrastructure Provisioning with Terraform
+### ğŸ—ï¸ Step 1: Infrastructure Provisioning with Terraform
 
 \`\`\`bash
 cd terraform
@@ -233,7 +234,7 @@ terraform apply -auto-approve
 
 > âš ï¸ **Important:** Configure AWS credentials before running Terraform.
 
-**í¾¯ What Gets Created:**
+**ğŸ¯ What Gets Created:**
 
 - âœ… VPC with public/private subnets
 - âœ… Internet Gateway & NAT Gateway
@@ -261,7 +262,7 @@ kubectl get ns -A
 
 ---
 
-### í°³ Step 3: Build & Test Docker Image (Local)
+### ğŸ³ Step 3: Build & Test Docker Image (Local)
 
 \`\`\`bash
 # Go to application directory
@@ -277,7 +278,7 @@ docker run -d --name netflix-clone-local -p 8080:80 netflix-clone:local
 curl http://localhost:8080
 \`\`\`
 
-**í´ Testing:**
+**ğŸ” Testing:**
 
 - âœ… Docker image builds successfully
 - âœ… Container starts without errors
@@ -290,7 +291,7 @@ docker rm -f netflix-clone-local
 
 ---
 
-### í³¦ Step 4: Push Docker Image to Amazon ECR
+### ğŸ“¦ Step 4: Push Docker Image to Amazon ECR
 
 **1ï¸âƒ£ Authenticate Docker to Amazon ECR**
 
@@ -319,7 +320,7 @@ docker push 734468801857.dkr.ecr.eu-central-1.amazonaws.com/nti_project:latest
 
 ---
 
-### í´„ Step 5: CI/CD + GitOps Automation (GitHub Actions â†’ ArgoCD)
+### ğŸ”„ Step 5: CI/CD + GitOps Automation (GitHub Actions â†’ ArgoCD)
 
 Once the Docker image is available in Amazon ECR, the CI/CD pipeline automatically performs security scans, tags and pushes the image, updates Kubernetes manifests, and triggers ArgoCD to sync and deploy the application to the EKS cluster.
 
@@ -327,21 +328,21 @@ Once the Docker image is available in Amazon ECR, the CI/CD pipeline automatical
 Scan â†’ Tag â†’ Push â†’ Update Manifest â†’ ArgoCD Sync â†’ Deploy
 ```
 
-**í´ Pipeline Responsibilities**
+**ğŸ” Pipeline Responsibilities**
 
 | Step | Action | Tool |
 |------|--------|------|
-| í´ | Trivy Scan (vulnerabilities + secrets) | Trivy |
-| í·ª | OWASP Dependency Check | OWASP |
+| ğŸ” | Trivy Scan (vulnerabilities + secrets) | Trivy |
+| ğŸ§ª | OWASP Dependency Check | OWASP |
 | âœ… | Code Quality Analysis | SonarQube |
-| í³¦ | Push New Tagged Images | Amazon ECR |
-| í³ | Update Kubernetes Manifest | Git |
-| í´„ | Trigger Auto-Sync | ArgoCD |
+| ğŸ“¦ | Push New Tagged Images | Amazon ECR |
+| ğŸ“ | Update Kubernetes Manifest | Git |
+| ğŸ”„ | Trigger Auto-Sync | ArgoCD |
 | â˜¸ï¸ | Deploy to EKS (my-eks) | Kubernetes |
 
 ---
 
-### í´„ Step 6: Install & Configure ArgoCD
+### ğŸ”„ Step 6: Install & Configure ArgoCD
 
 \`\`\`bash
 kubectl create namespace argocd
@@ -360,7 +361,7 @@ kubectl port-forward svc/argocd-server -n argocd 8080:443
 
 ---
 
-### í´ Step 7: Configure GitHub Secrets
+### ğŸ” Step 7: Configure GitHub Secrets
 
 **Repository â†’ Settings â†’ Secrets and variables â†’ Actions**
 
@@ -373,7 +374,7 @@ kubectl port-forward svc/argocd-server -n argocd 8080:443
 
 ---
 
-### í³¦ Step 8: Create ArgoCD Application
+### ğŸ“¦ Step 8: Create ArgoCD Application
 
 \`\`\`bash
 kubectl apply -f argocd/application.yaml
@@ -407,7 +408,7 @@ spec:
 
 ---
 
-### í´„ Step 9: Trigger Auto Deployment
+### ğŸ”„ Step 9: Trigger Auto Deployment
 
 Any change pushed to the main branch automatically triggers the CI/CD pipeline.
 
@@ -418,7 +419,7 @@ git commit -m "chore: trigger deployment"
 git push origin main
 \`\`\`
 
-**í´ Pipeline Flow**
+**ğŸ” Pipeline Flow**
 
 ```
 CI â†’ Scan â†’ Push to ECR â†’ Update Manifest â†’ ArgoCD Sync â†’ Deploy
@@ -428,18 +429,18 @@ CI â†’ Scan â†’ Push to ECR â†’ Update Manifest â†’ ArgoCD Sync â†’ Deploy
 
 | Step | Action | Tool |
 |------|--------|------|
-| í´– | GitHub Actions workflow starts | GitHub Actions |
-| í´ | Docker image scanned | Trivy |
-| í·ª | Dependency analysis | OWASP |
+| ğŸ¤– | GitHub Actions workflow starts | GitHub Actions |
+| ğŸ” | Docker image scanned | Trivy |
+| ğŸ§ª | Dependency analysis | OWASP |
 | âœ… | Code quality analysis | SonarQube |
-| í³¦ | Image tagged and pushed | Amazon ECR |
-| í³ | Manifest updated in GitOps branch | Git |
-| í´„ | ArgoCD detects change and syncs | ArgoCD |
+| ğŸ“¦ | Image tagged and pushed | Amazon ECR |
+| ğŸ“ | Manifest updated in GitOps branch | Git |
+| ğŸ”„ | ArgoCD detects change and syncs | ArgoCD |
 | â˜¸ï¸ | Application deployed to EKS | Kubernetes |
 
 ---
 
-### í³Š Step 10: Verify Deployment
+### ğŸ“Š Step 10: Verify Deployment
 
 After ArgoCD sync completes, verify that the application is running correctly.
 
@@ -456,7 +457,7 @@ kubectl get hpa -n netflix
 
 ---
 
-### íº€ Step 11: Verify Cluster Autoscaler
+### ğŸš€ Step 11: Verify Cluster Autoscaler
 
 Ensure that Cluster Autoscaler is running and managing node scaling.
 
@@ -471,7 +472,7 @@ kubectl get all -A | grep cluster-autoscaler
 
 ---
 
-### í´‘ Step 12: Verify External Secrets
+### ğŸ”‘ Step 12: Verify External Secrets
 
 External Secrets is used to securely inject sensitive values from AWS services instead of hardcoding them.
 
@@ -486,7 +487,7 @@ kubectl get all -n external-secrets
 
 ---
 
-### í´ Step 13: Verify TLS Certificate (ACM)
+### ğŸ” Step 13: Verify TLS Certificate (ACM)
 
 AWS Certificate Manager (ACM) is used to secure application traffic with HTTPS.
 
@@ -498,7 +499,7 @@ AWS Certificate Manager (ACM) is used to secure application traffic with HTTPS.
 
 ---
 
-### í¼ Step 14: Application Running
+### ğŸŒ Step 14: Application Running
 
 At this stage:
 
@@ -508,14 +509,14 @@ At this stage:
 
 ---
 
-## í¾¯ Key Features
+## ğŸ¯ Key Features
 
 <div align="center">
 <table>
 <tr>
 <td width="25%" align="center">
 
-### íº€ Automation
+### ğŸš€ Automation
 
 - âœ… Fully automated CI/CD pipeline
 - âœ… GitOps-based deployment
@@ -525,7 +526,7 @@ At this stage:
 </td>
 <td width="25%" align="center">
 
-### í´’ Security
+### ğŸ”’ Security
 
 - âœ… Trivy vulnerability & secret scanning
 - âœ… OWASP Dependency Check
@@ -535,7 +536,7 @@ At this stage:
 </td>
 <td width="25%" align="center">
 
-### í³Š Observability
+### ğŸ“Š Observability
 
 - âœ… Prometheus metrics collection
 - âœ… Grafana dashboards
@@ -545,7 +546,7 @@ At this stage:
 </td>
 <td width="25%" align="center">
 
-### í´„ GitOps
+### ğŸ”„ GitOps
 
 - âœ… Git as single source of truth
 - âœ… Declarative configuration
@@ -559,32 +560,32 @@ At this stage:
 
 ---
 
-## í» ï¸ Technologies Stack
+## ğŸ› ï¸ Technologies Stack
 
 <div align="center">
 
 | Category | Technology | Purpose |
 |----------|------------|---------|
 | â˜ï¸ Cloud | ![AWS](https://img.shields.io/badge/AWS-232F3E?style=flat&logo=amazonaws&logoColor=white) | EKS, VPC, ECR, ACM, Route 53, Cognito, S3 |
-| í¿—ï¸ IaC | ![Terraform](https://img.shields.io/badge/Terraform-7B42BC?style=flat&logo=terraform&logoColor=white) | Infrastructure provisioning |
+| ğŸ—ï¸ IaC | ![Terraform](https://img.shields.io/badge/Terraform-7B42BC?style=flat&logo=terraform&logoColor=white) | Infrastructure provisioning |
 | â˜¸ï¸ Orchestration | ![Kubernetes](https://img.shields.io/badge/Kubernetes-326CE5?style=flat&logo=kubernetes&logoColor=white) | Container orchestration |
-| í°³ Containerization | ![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat&logo=docker&logoColor=white) | Application packaging |
-| í´„ GitOps | ![ArgoCD](https://img.shields.io/badge/ArgoCD-EF7B4D?style=flat&logo=argo&logoColor=white) | Continuous deployment |
-| í´– CI/CD | ![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-2088FF?style=flat&logo=githubactions&logoColor=white) | Continuous integration |
-| í³¦ Registry | ![Amazon ECR](https://img.shields.io/badge/Amazon_ECR-FF9900?style=flat&logo=amazonaws&logoColor=white) | Container image storage |
-| í´ Security Scan | ![Trivy](https://img.shields.io/badge/Trivy-1904DA?style=flat&logo=aquasecurity&logoColor=white) | Vulnerability scanning |
-| í·ª Dependency Check | ![OWASP](https://img.shields.io/badge/OWASP-000000?style=flat&logo=owasp&logoColor=white) | Dependency analysis |
+| ğŸ³ Containerization | ![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat&logo=docker&logoColor=white) | Application packaging |
+| ğŸ”„ GitOps | ![ArgoCD](https://img.shields.io/badge/ArgoCD-EF7B4D?style=flat&logo=argo&logoColor=white) | Continuous deployment |
+| ğŸ¤– CI/CD | ![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-2088FF?style=flat&logo=githubactions&logoColor=white) | Continuous integration |
+| ğŸ“¦ Registry | ![Amazon ECR](https://img.shields.io/badge/Amazon_ECR-FF9900?style=flat&logo=amazonaws&logoColor=white) | Container image storage |
+| ğŸ” Security Scan | ![Trivy](https://img.shields.io/badge/Trivy-1904DA?style=flat&logo=aquasecurity&logoColor=white) | Vulnerability scanning |
+| ğŸ§ª Dependency Check | ![OWASP](https://img.shields.io/badge/OWASP-000000?style=flat&logo=owasp&logoColor=white) | Dependency analysis |
 | âœ… Code Quality | ![SonarQube](https://img.shields.io/badge/SonarQube-4E9BCD?style=flat&logo=sonarqube&logoColor=white) | Static code analysis |
-| í³Š Monitoring | ![Prometheus](https://img.shields.io/badge/Prometheus-E6522C?style=flat&logo=prometheus&logoColor=white) | Metrics collection |
-| í³ˆ Visualization | ![Grafana](https://img.shields.io/badge/Grafana-F46800?style=flat&logo=grafana&logoColor=white) | Dashboard & analytics |
-| íº¨ Alerting | ![Alertmanager](https://img.shields.io/badge/Alertmanager-E6522C?style=flat&logo=prometheus&logoColor=white) | Alert management |
-| í´” Notifications | ![Slack](https://img.shields.io/badge/Slack-4A154B?style=flat&logo=slack&logoColor=white) | Team notifications |
+| ğŸ“Š Monitoring | ![Prometheus](https://img.shields.io/badge/Prometheus-E6522C?style=flat&logo=prometheus&logoColor=white) | Metrics collection |
+| ğŸ“ˆ Visualization | ![Grafana](https://img.shields.io/badge/Grafana-F46800?style=flat&logo=grafana&logoColor=white) | Dashboard & analytics |
+| ğŸš¨ Alerting | ![Alertmanager](https://img.shields.io/badge/Alertmanager-E6522C?style=flat&logo=prometheus&logoColor=white) | Alert management |
+| ğŸ”” Notifications | ![Slack](https://img.shields.io/badge/Slack-4A154B?style=flat&logo=slack&logoColor=white) | Team notifications |
 
 </div>
 
 ---
 
-## í³Š Project Outcomes
+## ğŸ“Š Project Outcomes
 
 | Category | Achievement | Status |
 |----------|-------------|--------|
@@ -597,7 +598,7 @@ At this stage:
 
 ---
 
-## í³ˆ Performance Metrics
+## ğŸ“ˆ Performance Metrics
 
 <table align="center">
 <tr>
@@ -611,7 +612,7 @@ From commit to EKS
 </td>
 <td align="center" width="33%">
 
-### í´„ GitOps Sync
+### ğŸ”„ GitOps Sync
 
 **Automatic**  
 Triggered by Manifests
@@ -619,7 +620,7 @@ Triggered by Manifests
 </td>
 <td align="center" width="33%">
 
-### í¾¯ Reliability
+### ğŸ¯ Reliability
 
 **High Availability**  
 Self-healing enabled
@@ -630,7 +631,7 @@ Self-healing enabled
 
 ---
 
-## í¾“ Learning Outcomes
+## ğŸ“ Learning Outcomes
 
 ### â˜ï¸ Cloud & Infrastructure
 
@@ -642,7 +643,7 @@ Self-healing enabled
 - **Workload Management:** Advanced use of Deployments, Services, Secrets, and ConfigMaps.
 - **Elasticity:** Implementing HPA and Cluster Autoscaler for cost-efficient scaling.
 
-### í´– DevSecOps & GitOps
+### ğŸ¤– DevSecOps & GitOps
 
 - **Automation:** Building robust GitHub Actions pipelines and ArgoCD workflows.
 - **Security Scanning:** Implementing vulnerability (Trivy) and dependency (OWASP) checks.
@@ -650,31 +651,31 @@ Self-healing enabled
 
 ---
 
-## í´® Future Enhancements
+## ğŸ”® Future Enhancements
 
 | Feature | Description | Priority |
 |---------|-------------|----------|
-| í³Š Advanced Dashboards | Deep-dive Grafana metrics for app performance | í´´ High |
-| íº¨ Alerting | Critical alerts via Alertmanager & Slack | í´´ High |
-| í´ Centralized Logging | Log aggregation using ELK or Loki | í¿¡ Medium |
-| í´„ Deployment Strategies | Implementing Blue-Green or Canary releases | í¿¡ Medium |
-| í´ Secrets Management | Transitioning to HashiCorp Vault | í¿¡ Medium |
+| ğŸ“Š Advanced Dashboards | Deep-dive Grafana metrics for app performance | ğŸ”´ High |
+| ğŸš¨ Alerting | Critical alerts via Alertmanager & Slack | ğŸ”´ High |
+| ğŸ” Centralized Logging | Log aggregation using ELK or Loki | ğŸŸ¡ Medium |
+| ğŸ”„ Deployment Strategies | Implementing Blue-Green or Canary releases | ğŸŸ¡ Medium |
+| ğŸ” Secrets Management | Transitioning to HashiCorp Vault | ğŸŸ¡ Medium |
 
 ---
 
-## í³– Documentation
+## ğŸ“– Documentation
 
 > [!TIP]
 > Click on the links below to explore the detailed technical documentation.
 
-- í³˜ **Setup Guide** â€“ Cluster & infrastructure provisioning steps.
-- í´§ **Configuration** â€“ Detailed CI/CD and GitOps settings.
-- í¿—ï¸ **Architecture** â€“ System design and workflow explanation.
-- í´’ **Security** â€“ Hardening practices and tool configurations.
+- ğŸ“˜ **Setup Guide** â€“ Cluster & infrastructure provisioning steps.
+- ğŸ”§ **Configuration** â€“ Detailed CI/CD and GitOps settings.
+- ğŸ—ï¸ **Architecture** â€“ System design and workflow explanation.
+- ğŸ”’ **Security** â€“ Hardening practices and tool configurations.
 
 ---
 
-## í´ Acknowledgments
+## ğŸ¤ Acknowledgments
 
 > [!IMPORTANT]
 > **National Telecommunication Institute (NTI)**  
@@ -682,7 +683,7 @@ Self-healing enabled
 
 ---
 
-## í³ Conclusion
+## ğŸ“ Conclusion
 
 This project represents a complete, **Production-Grade** implementation of modern **DevSecOps**. By integrating **GitOps** as the bridge between development and operations, we ensure that every change is audited, secure, and automatically deployed.
 
@@ -696,9 +697,10 @@ Code â†’ Build â†’ Scan â†’ Push to ECR â†’ Manifest Update â†’ ArgoCD Sync â†’ 
 
 <div align="center">
 
-### í¼Ÿ **Star this repository if you found it helpful!**
+### ğŸŒŸ **Star this repository if you found it helpful!**
 
 **Sohila Hosam**  
 [GitHub Profile](https://github.com/sohila12)
 
 </div>
+
