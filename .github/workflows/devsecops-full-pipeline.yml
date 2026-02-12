@@ -1,11 +1,16 @@
 name: Full DevSecOps Pipeline (Mirror + Trivy + Sonar + OWASP + Notify)
 
+
 on:
   workflow_dispatch:
   push:
     branches: ["main"]
-    paths-ignore:
-      - "Kubernetes/deployment.yml"
+    paths:
+      - "Source-Code/Application-Code/**"
+      - "Kubernetes/**"
+      - ".github/workflows/devsecops-full-pipeline.yml"
+      - "!Kubernetes/deployment.yml"
+
 
 permissions:
   contents: write
@@ -111,29 +116,24 @@ jobs:
           FILE="Kubernetes/deployment.yml"
           SHORT_SHA="${GITHUB_SHA::7}"
 
-          # 1) Make branch name truly unique per run + attempt + time
           TS="$(date +%s%N)"
           BRANCH="gitops/deploy-${GITHUB_REF_NAME}-${SHORT_SHA}-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-${TS}"
 
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          # Ensure we have all remote refs (important to avoid stale-info surprises)
           git fetch origin --prune
 
-          # 2) If branch already exists on remote (rare, but possible), suffix it again
           if git ls-remote --exit-code --heads origin "$BRANCH" >/dev/null 2>&1; then
             BRANCH="${BRANCH}-$RANDOM"
           fi
 
           echo "Using GitOps branch: $BRANCH"
-
           git checkout -b "$BRANCH"
 
           test -f "$FILE" || (echo "❌ File not found: $FILE" && exit 1)
           test -n "${ECR_IMAGE:-}" || (echo "❌ ECR_IMAGE is empty" && exit 1)
 
-          # Update image line
           perl -0777 -pi -e "s|(^\\s*image:\\s*).*$|\\1$ECR_IMAGE|mg" "$FILE"
 
           echo "✅ Updated image to: $ECR_IMAGE"
@@ -147,16 +147,13 @@ jobs:
           fi
 
           git commit -m "chore(gitops): deploy image ${ECR_IMAGE}"
-
-          # Push safely (won't overwrite if remote advanced unexpectedly)
           git push -u origin "$BRANCH" --force-with-lease
 
           echo "✅ Pushed branch: $BRANCH"
           echo "branch=$BRANCH" >> "$GITHUB_OUTPUT"
 
-
   sonarqube_local:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.RUN_LOCAL_SONAR == 'true'
     runs-on: self-hosted
     needs: [mirror_trivy_push_gitops]
 
@@ -256,9 +253,9 @@ jobs:
           echo "✅ Uploaded: ${DEST}"
 
   argocd_results:
+    if: vars.RUN_EKS_SNAPSHOTS == 'true'
     runs-on: self-hosted
     needs: [mirror_trivy_push_gitops]
-    if: always()
 
     steps:
       - name: Checkout
