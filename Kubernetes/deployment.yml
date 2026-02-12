@@ -22,7 +22,7 @@ spec:
               app: netflix-clone
       containers:
         - name: web
-          image: 734468801857.dkr.ecr.eu-central-1.amazonaws.com/nti_project:latest
+{4468801857.dkr.ecr.eu-central-1.amazonaws.com/nti_project:main-dcbcf31
           ports:
             - containerPort: 80
 
