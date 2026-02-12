@@ -753,8 +753,6 @@ At this stage:
 > [!TIP]
 > Click on the links below to explore the detailed technical documentation.
 
-* 🏗️ **Architecture Diagram (Draw.io)**  
- 👉 [View Kubernetes Architecture Diagram (PDF)](docs/architecture/k8s-architecture.drawio.pdf)
 
 ---
 
